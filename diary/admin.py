@@ -1,3 +1,7 @@
 from django.contrib import admin
+from diary.models import Diary
 
-# Register your models here.
+
+@admin.register(Diary)
+class DiaryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'created_at', 'owner')

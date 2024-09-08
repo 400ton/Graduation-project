@@ -1,0 +1,128 @@
+        /* Основные стили */
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+        }
+
+        /* Навигационное меню */
+        nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 0;
+            box-shadow: none;
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+        }
+
+        nav a:hover {
+            color: #087990;
+        }
+
+        /* Заголовок */
+        header {
+            background-color: #ffffff;
+            padding: 60px 0;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #087990;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #666;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Карточки для дневников */
+        .diary-section {
+            padding: 40px 0;
+        }
+
+        .diary-entry {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #087990;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .diary-entry:hover {
+            transform: translateY(-5px);
+        }
+
+        .diary-entry h2 {
+            font-size: 1.75rem;
+            margin-bottom: 10px;
+            color: #087990;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .diary-entry p {
+            color: #555;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Кнопка */
+        .btn-primary-custom {
+            background-color: #087990;
+            border: none;
+            padding: 10px 25px;
+            color: white;
+            border-radius: 50px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            font-family: 'Roboto', sans-serif;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #066c7a;
+        }
+
+        /* Футер */
+        footer {
+            background-color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #087990;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Адаптивный стиль для мобильных устройств */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .diary-entry {
+                margin-bottom: 20px;
+            }
+        }

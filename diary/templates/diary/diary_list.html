@@ -1,0 +1,17 @@
+{% extends 'diary/home.html' %}
+{% block content %}
+<!-- Секция с дневниками -->
+<section class="diary-section container">
+    <div class="row">
+        {% for object in object_list %}
+        <div class="col-md-4 mb-4">
+            <div class="diary-entry">
+                <h2>{{ object.title }}</h2>
+                <p>{{ object.content|truncatewords:25 }}</p>
+                <a href="/" class="btn btn-primary-custom">Читать далее</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
