@@ -1,16 +1,34 @@
 import secrets
-
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.views import PasswordResetView
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView
 
 from config.settings import EMAIL_HOST_USER
-from users.forms import UserRegisterForm, UserProfileForm
+from users.forms import UserRegisterForm, UserProfileForm, UserLoginForm
 from users.models import User
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('users:profile')  # Перенаправление на профиль пользователя или другую страницу
+            else:
+                messages.error(request, "Неверный email или пароль")
+    else:
+        form = UserLoginForm()
+
+    return render(request, 'users/login.html', {'form': form})
 
 
 class RegisterView(CreateView):
@@ -20,30 +38,33 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
-        user = form.save()
+        user = form.save(commit=False)
         user.is_active = False
-        user.set_password(user.password)
+        user.set_password(form.cleaned_data['password1'])
         verification_code = secrets.token_hex(16)
         user.verification_code = verification_code
         user.save()
+
         host = self.request.get_host()
-        url = f'http://{host}/users/email.confirm/{verification_code}'
+        url = f'http://{host}/users/email-confirm/{verification_code}'
+
         send_mail(
             subject='Подтверждение почты',
             message=f'Для подтверждения почты перейдите по ссылке: {url}',
             from_email=EMAIL_HOST_USER,
             recipient_list=[user.email],
         )
-        user.save()
+
         return super().form_valid(form)
 
 
-def email_verification(request, verification_code):
+def email_confirm(request, verification_code):
     user = get_object_or_404(User, verification_code=verification_code)
     if user:
         user.is_active = True
+        user.verification_code = None
         user.save()
-        return redirect(reverse("users:login"))
+        return redirect('users:login')
 
 
 class GeneratePasswordView(PasswordResetView):

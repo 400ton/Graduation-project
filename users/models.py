@@ -5,7 +5,7 @@ NULLABLE = {"blank": True, "null": True}
 
 
 class User(AbstractUser):
-    username = None
+    username = 'Не указано'
 
     email = models.EmailField(unique=True, max_length=35, verbose_name='почта')
     avatar = models.ImageField(upload_to='media/users/avatars', verbose_name='аватар', **NULLABLE)
@@ -18,7 +18,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        return f"{self.email} "
+        return f"{self.email} {self.is_active}"
 
     class Meta:
         verbose_name = 'Пользователь'

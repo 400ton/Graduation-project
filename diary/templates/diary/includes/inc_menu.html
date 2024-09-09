@@ -6,12 +6,13 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+            {% if user.is_authenticated %}
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'users:profile' %}">Профиль</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Создать запись</a>
+                    <a class="nav-link" href="{% url 'diary:create' %}">Создать запись</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Сообщения</a>
@@ -20,6 +21,17 @@
                     <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
                 </li>
             </ul>
+            {% else %}
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
+                </li>
+
+            </ul>
+            {% endif %}
         </div>
     </div>
 </nav>

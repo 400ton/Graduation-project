@@ -58,7 +58,7 @@ class DiaryCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Создать заметку'
+        context['title'] = 'Создать запись'
         return context
 
 
