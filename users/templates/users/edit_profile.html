@@ -1,21 +1,22 @@
 {% extends 'diary/base.html' %}
 {% block content %}
 <style>
-    .login-container {
+
+    .profile-edit-container {
         background-color: #ffffff;
         border-radius: 8px;
         padding: 40px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         margin: 100px auto;
-        max-width: 500px;
+        max-width: 600px;
     }
 
-    .login-header {
+    .profile-edit-header {
         text-align: center;
         margin-bottom: 30px;
     }
 
-    .login-header h1 {
+    .profile-edit-header h1 {
         font-family: 'Montserrat', sans-serif;
         color: #087990;
         font-size: 2.5rem;
@@ -61,24 +62,26 @@
     .text-center a:hover {
         text-decoration: underline;
     }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+    }
 </style>
 <div class="container">
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Вход</h1>
+    <div class="profile-edit-container">
+        <div class="profile-edit-header">
+            <h1>Редактирование профиля</h1>
         </div>
 
-        <form method="POST" action="{% url 'users:login' %}">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <!-- Кнопка отправки -->
-            <button type="submit" class="btn btn-custom">Войти</button>
+            <button type="submit" class="btn btn-custom">Сохранить изменения</button>
             <div class="text-center">
-                <p>Забыли пароль? <a href="{% url 'users:reset' %}">Восстановить</a></p>
-                <p>Нет аккаунта? <a href="{% url 'users:register' %}">Регистрация</a></p>
+                <p><a href="{% url 'users:profile' %}">Вернуться к профилю</a></p>
             </div>
         </form>
     </div>
 </div>
-
 {% endblock %}
