@@ -43,8 +43,9 @@ class Diary(models.Model):
         verbose_name_plural = 'Дневники'
         ordering = ['-created_at']
         permissions = [
-            ('can_moderate_records', 'Возможность модерации'),
+            ('can_moderate', 'Может модерировать записи'),
         ]
+
 
 
 class Message(models.Model):

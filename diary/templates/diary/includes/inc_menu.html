@@ -6,7 +6,10 @@
     <a href="{% url 'diary:create' %}">Создать запись</a>
     <a href="#">Сообщения</a>
 
+    {% if perms.diary.can_moderate %}
     <a href="{% url 'diary:moderation_list' %}">Модерация</a>
+    {% endif %}
+
     <a href="{% url 'users:logout' %}">Выйти</a>
     {% else %}
     <a href="/">Главная</a>

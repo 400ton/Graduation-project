@@ -77,23 +77,25 @@ class GeneratePasswordView(PasswordResetView):
     template_name = 'users/reset_password.html'
 
     def form_valid(self, form):
-        if form.is_valid():
-            email = form.cleaned_data['email']
+        email = form.cleaned_data['email']
+        try:
             user = User.objects.get(email=email)
             password = User.objects.make_random_password(length=8)
             user.set_password(password)
             user.save()
+
             send_mail(
                 'Смена пароля',
-                f'Здравствуйте.Вы запросили генерацию нового пароля для локального сайта. '
+                f'Здравствуйте. Вы запросили генерацию нового пароля для локального сайта. '
                 f'Ваш новый пароль: {password}',
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[user.email],
             )
-            return redirect(reverse("users:reset"))
-        else:
-            messages.error(self.request, "Произошла ошибка при генерации пароля.")
+        except User.DoesNotExist:
+            messages.error(self.request, "Пользователь с таким email не найден.")
             return super().form_invalid(form)
+
+        return redirect(self.success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

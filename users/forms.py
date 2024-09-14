@@ -58,20 +58,13 @@ class UserRegisterForm(forms.ModelForm):
         return user
 
 
-class CustomPasswordResetForm(forms.ModelForm):
+class CustomPasswordResetForm(forms.Form):
     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
-    class Meta:
-        model = User
-        fields = ['email']
-
     def clean_email(self):
-        """
-        Проверка, существует ли уже такой email
-        """
         email = self.cleaned_data.get('email')
         if not User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Email не найден")
+            raise forms.ValidationError("Пользователь с таким email не найден")
         return email
 
 

@@ -11,7 +11,6 @@ from config.settings import EMAIL_HOST_USER
 from diary.forms import DiaryForm, DiaryUpdateForm
 from diary.models import Diary
 from users.models import User
-from pytils.translit import slugify
 
 
 class HomeListView(ListView):
@@ -54,7 +53,6 @@ class DiaryDetailView(LoginRequiredMixin, DetailView):
         if 'publish' in request.POST:
             self.object.status = 'moderation'  # Изменение статуса на "На модерации"
             self.object.save()
-            # Логика отправки уведомления модератору может быть здесь
         return redirect('diary:detail', slug=self.object.slug)
 
     @staticmethod
@@ -121,8 +119,7 @@ class DiaryDeleteView(LoginRequiredMixin, DeleteView):
 class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Diary
     template_name = 'diary/moderation_list.html'
-    context_object_name = 'diaries'
-    permission_required = 'diary.can_moderate_records'
+    permission_required = 'diary.can_moderate'
 
     def get_queryset(self):
         # Возвращаем записи, которые находятся на модерации
@@ -130,7 +127,7 @@ class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
 
 
 class DiaryModerationActionView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'diary.can_moderate_records'
+    permission_required = 'diary.can_moderate'
 
     def post(self, request, *args, **kwargs):
         diary = get_object_or_404(Diary, slug=kwargs['slug'])
