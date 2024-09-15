@@ -14,6 +14,10 @@ from users.models import User
 
 
 class HomeListView(ListView):
+    """
+    Представление для отображения главной страницы с опубликованными записями.
+    - queryset: выбираются только записи со статусом is_published=True.
+    """
     model = Diary
     template_name = "diary/home.html"
     queryset = Diary.objects.filter(is_published=True)  # выбираем только опубликованные записи
@@ -26,6 +30,10 @@ class HomeListView(ListView):
 
 
 class DiaryListView(LoginRequiredMixin, ListView):
+    """
+    Представление для отображения списка заметок текущего пользователя.
+    - queryset: выбираются записи только для владельца (request.user).
+    """
     model = Diary
     template_name = 'diary/diary_list.html'
     paginate_by = 10
@@ -40,6 +48,12 @@ class DiaryListView(LoginRequiredMixin, ListView):
 
 
 class DiaryDetailView(LoginRequiredMixin, DetailView):
+    """
+    Представление для отображения деталей записи.
+    - При каждом просмотре запись увеличивает счетчик просмотров.
+    - Если просмотров более 100, отправляется уведомление.
+    - При POST запросе запись может быть отправлена на модерацию.
+    """
     model = Diary
     template_name = 'diary/diary_detail.html'
 
@@ -74,6 +88,10 @@ class DiaryDetailView(LoginRequiredMixin, DetailView):
 
 
 class DiaryCreateView(LoginRequiredMixin, CreateView):
+    """
+    Представление для создания новой записи.
+    - После успешного создания, запись сохраняется за текущим пользователем.
+    """
     model = Diary
     form_class = DiaryForm
     success_url = reverse_lazy('diary:list')
@@ -91,6 +109,10 @@ class DiaryCreateView(LoginRequiredMixin, CreateView):
 
 
 class DiaryUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Представление для обновления записи.
+    - Пользователь может редактировать только свои записи.
+    """
     model = Diary
     form_class = DiaryUpdateForm
 
@@ -107,6 +129,11 @@ class DiaryUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class DiaryDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Представление для удаления записи.
+    - Пользователь может удалить только свои записи.
+    - После удаления происходит перенаправление на список записей.
+    """
     model = Diary
     success_url = reverse_lazy('diary:list')
 
@@ -117,6 +144,11 @@ class DiaryDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """
+    Представление для модераторов.
+    - Отображает список записей, которые находятся на модерации.
+    - Пользователю должна быть выдана соответствующая роль для доступа к этой странице.
+    """
     model = Diary
     template_name = 'diary/moderation_list.html'
     permission_required = 'diary.can_moderate'
@@ -130,9 +162,12 @@ class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
         return context
 
 
-
-
 class DiaryModerationActionView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    """
+    Представление для модераторов.
+    - Позволяет утвердить или отклонить запись, отправленную на модерацию.
+    - При утверждении запись публикуется, при отклонении — отклоняется.
+    """
     permission_required = 'diary.can_moderate'
 
     def post(self, request, *args, **kwargs):

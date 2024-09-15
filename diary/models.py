@@ -47,7 +47,6 @@ class Diary(models.Model):
         ]
 
 
-
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.SET_NULL, **NULLABLE)
     recipient = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='messages', **NULLABLE)
