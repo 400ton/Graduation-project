@@ -122,8 +122,14 @@ class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
     permission_required = 'diary.can_moderate'
 
     def get_queryset(self):
-        # Возвращаем записи, которые находятся на модерации
         return Diary.objects.filter(status='moderation')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Модерация'
+        return context
+
+
 
 
 class DiaryModerationActionView(LoginRequiredMixin, PermissionRequiredMixin, View):

@@ -75,13 +75,34 @@
         </div>
 
         <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-custom">Сохранить изменения</button>
-            <div class="text-center">
-                <p><a href="{% url 'users:profile' %}">Вернуться к профилю</a></p>
-            </div>
-        </form>
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.first_name.label_tag }}
+        {{ form.first_name }}
+    </div>
+    <div class="form-group">
+        {{ form.last_name.label_tag }}
+        {{ form.last_name }}
+    </div>
+    <div class="form-group">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+    </div>
+    <div class="form-group">
+        {{ form.num_phone.label_tag }}
+        {{ form.num_phone }}
+    </div>
+    <div class="form-group">
+        {{ form.country.label_tag }}
+        {{ form.country }}
+    </div>
+    <div class="form-group">
+        {{ form.avatar.label_tag }}
+        {{ form.avatar }}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+</form>
+
     </div>
 </div>
 {% endblock %}

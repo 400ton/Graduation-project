@@ -1,5 +1,4 @@
 {% extends 'diary/base.html' %}
-
 {% block content %}
 <style>
     .diary-detail-container {
@@ -75,32 +74,20 @@
 </style>
 
 <div class="diary-detail-container">
-    <!-- Заголовок записи -->
     <h1 class="diary-detail-title">{{ object.title }}</h1>
-
-    <!-- Дата создания записи -->
     <p class="diary-detail-date">Создано: {{ object.created_at|date:"d M Y" }}</p>
-
-    <!-- Превью изображения (если есть) -->
     {% if object.preview %}
     <img src="{{ object.preview.url }}" alt="Превью записи" class="img-fluid diary-detail-preview">
     {% endif %}
-
-    <!-- Основное содержание записи -->
     <div class="diary-detail-content">
         {{ object.content|linebreaks }}
     </div>
-
     <p class="diary-detail-views">Просмотров: {{ object.views }}</p>
-
     <p class="diary-detail-status">Статус: {{ object.get_status_display }}</p>
-
-    <!-- Кнопки редактирования, удаления и публикации записи (если это владелец записи) -->
     {% if request.user == object.owner %}
     <div class="btn-back">
         <a href="{% url 'diary:update' slug=object.slug %}" class="btn btn-custom">Редактировать</a>
         <a href="{% url 'diary:delete' slug=object.slug %}" class="btn btn-custom">Удалить</a>
-
         {% if object.status == 'no_published' %}
         <form method="POST" style="display: inline;">
             {% csrf_token %}

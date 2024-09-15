@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth.forms import UserChangeForm
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -11,11 +10,12 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     def clean(self):
+        """
+        Проверяет, существует ли пользователь с указанным email и паролем
+        """
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
         password = cleaned_data.get('password')
-
-        # Аутентификация по email
         user = authenticate(username=email, password=password)
         if not user:
             raise ValidationError("Неверный email или пароль")
@@ -27,20 +27,7 @@ class UserRegisterForm(forms.ModelForm):
     password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-    class Meta:
-        model = User
-        fields = ['email']
-
-    def clean_email(self):
-        """
-        Проверка, существует ли уже такой email
-        """
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Пользователь с таким email уже существует")
-        return email
-
-    def clean_password2(self):
+    def clean_password(self):
         """
         Проверка пароля
         """
@@ -50,35 +37,34 @@ class UserRegisterForm(forms.ModelForm):
             raise forms.ValidationError("Пароли не совпадают")
         return password2
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
-        return user
+    class Meta:
+        model = User
+        fields = ['email']
 
 
 class CustomPasswordResetForm(forms.Form):
+    """
+    Форма для сброса пароля пользователя через email
+    """
     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Пользователь с таким email не найден")
-        return email
+    class Meta:
+        model = User
+        fields = ['email']
 
 
 class UserProfileForm(forms.ModelForm):
+    """
+    Форма для редактирования профиля пользователя
+    """
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'num_phone', 'country', 'avatar']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'num_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'country': forms.TextInput(attrs={'class': 'form-control'}),
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})

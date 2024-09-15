@@ -6,7 +6,7 @@ from django.contrib.auth.views import PasswordResetView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DetailView
 
 from config.settings import EMAIL_HOST_USER
 from users.forms import UserRegisterForm, UserProfileForm, UserLoginForm, CustomPasswordResetForm
@@ -14,6 +14,12 @@ from users.models import User
 
 
 def login_view(request):
+    """
+    Представление для входа пользователя.
+    Проверяет введенные данные, аутентифицирует пользователя с использованием email и пароля.
+    При успешной аутентификации перенаправляет на страницу с записями (diary:list).
+    """
+
     form = UserLoginForm(request.POST or None)
 
     if form.is_valid():
@@ -28,12 +34,21 @@ def login_view(request):
 
 
 class RegisterView(CreateView):
+    """
+    Представление для регистрации нового пользователя.
+    Сохраняет пользователя в неактивном состоянии и отправляет email для подтверждения.
+    После успешной регистрации перенаправляет на страницу входа.
+    """
     model = User
     form_class = UserRegisterForm
     template_name = 'users/register.html'
     success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
+        """
+        Обрабатывает сохранение формы. Создает неактивного пользователя с кодом подтверждения.
+        Отправляет email с подтверждением.
+        """
         user = form.save(commit=False)
         user.is_active = False
         user.set_password(form.cleaned_data['password1'])
@@ -50,7 +65,6 @@ class RegisterView(CreateView):
             from_email=EMAIL_HOST_USER,
             recipient_list=[user.email],
         )
-        print(form)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -64,19 +78,39 @@ def email_confirm(request, verification_code):
     Проверка кода верификации, активирует профиль пользователя
     """
     user = get_object_or_404(User, verification_code=verification_code)
-    if user:
+    if user.is_active:
+        messages.info(request, 'Аккаунт уже активирован.')
+    else:
         user.is_active = True
         user.verification_code = None
         user.save()
         return redirect('users:login')
 
 
+class UserProfileView(LoginRequiredMixin, DetailView):
+    """
+    Представление для отображения профиля пользователя.
+    """
+    model = User
+    template_name = 'users/profile.html'
+
+    def get_object(self, **kwargs):
+        return self.request.user
+
+
 class GeneratePasswordView(PasswordResetView):
+    """
+    Представление для генерации нового пароля.
+    Генерирует новый пароль и отправляет его на email пользователя
+    """
     form_class = CustomPasswordResetForm
     success_url = reverse_lazy('users:login')
     template_name = 'users/reset_password.html'
 
     def form_valid(self, form):
+        """
+        Обрабатывает форму. Генерирует новый пароль для пользователя и отправляет его на email.
+        """
         email = form.cleaned_data['email']
         try:
             user = User.objects.get(email=email)
@@ -104,6 +138,9 @@ class GeneratePasswordView(PasswordResetView):
 
 
 class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Представление для обновления профиля пользователя.
+    """
     model = User
     form_class = UserProfileForm
     template_name = 'users/edit_profile.html'
@@ -112,6 +149,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, **kwargs):
         return self.request.user
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        return response
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Редактирование профиля'
+        return context
