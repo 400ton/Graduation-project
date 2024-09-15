@@ -1,5 +1,6 @@
 {% extends 'diary/base.html' %}
 {% block content %}
+
 <!-- Секция с дневниками -->
 <section class="diary-section">
         {% for object in object_list %}
@@ -14,4 +15,5 @@
         </div>
         {% endfor %}
 </section>
+
 {% endblock %}

@@ -1,8 +1,25 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 body {
     background: linear-gradient(to bottom, #1f4037, #99f2c8);
+    min-height: 100vh;
     font-family: 'Roboto', sans-serif;
     color: #333;
-    }
+}
+
+/* Контейнер для основного контента */
+.diary {
+    flex: 1;
+    margin-left: 10px;
+    margin-right: 260px;
+    margin-top: 10px;
+}
 
 /* Навигационное меню справа */
 nav {
@@ -15,7 +32,7 @@ nav {
     height: 97.5%;
     width: 250px;
     box-shadow: none;
-        }
+}
 
 nav a {
     color: #333;
@@ -24,11 +41,11 @@ nav a {
     font-weight: 500;
     display: block;
     padding: 10px 0;
-        }
+}
 
 nav a:hover {
     color: #087990;
-        }
+}
 
 /* Заголовок */
 header {
@@ -36,8 +53,8 @@ header {
     padding: 60px 0;
     text-align: center;
     border-bottom: 1px solid #e0e0e0;
-    margin: 10px auto
-        }
+    margin: 10px auto;
+}
 
 header h1 {
     font-family: 'Montserrat', sans-serif;
@@ -45,26 +62,19 @@ header h1 {
     font-weight: 500;
     margin-bottom: 20px;
     color: #087990;
-        }
+}
 
 header p {
     font-size: 1.2rem;
     color: #666;
     font-family: 'Roboto', sans-serif;
-        }
+}
 
 /* Стиль списка записей */
-.diary {
-    margin-left: 10px;
-    margin-right: 260px;
-    margin-top: 10px;
-        }
-
 .diary-section {
     padding: 0px 0;
     margin: 10px auto;
-
-        }
+}
 
 .diary-entry {
     background-color: #ffffff;
@@ -74,34 +84,34 @@ header p {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     border-left: 5px solid #087990;
     position: relative;
-        }
+}
 
 .diary-entry h2 {
     font-size: 1.75rem;
     margin-bottom: 10px;
     color: #087990;
     font-family: 'Montserrat', sans-serif;
-        }
+}
 
 .diary-entry p {
     color: #555;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
     line-height: 1.6;
-        }
+}
 
 .diary-entry .entry-date {
     font-size: 0.9rem;
     color: #999;
     margin-bottom: 15px;
-        }
+}
 
-        /* Кнопки */
+/* Кнопки */
 .btn-group-custom {
     position: absolute;
     top: 20px;
     right: 20px;
-        }
+}
 
 .btn-custom {
     background-color: #087990;
@@ -113,11 +123,11 @@ header p {
     transition: background-color 0.3s ease-in-out;
     margin-left: 10px;
     margin-top: 5px;
-        }
+}
 
 .btn-custom:hover {
     background-color: #066c7a;
-        }
+}
 
 /* Футер */
 footer {
@@ -127,52 +137,52 @@ footer {
     border-top: 1px solid #e0e0e0;
     color: #666;
     font-size: 0.9rem;
-    margin: 10px auto
-
-        }
+    margin: 10px auto;
+    flex-shrink: 0; /* Устанавливаем, чтобы футер не сжимался */
+}
 
 footer a {
     color: #087990;
     text-decoration: none;
-        }
+}
 
 footer a:hover {
     text-decoration: underline;
-        }
+}
 
 .login-container {
-        background-color: #ffffff;
-        border-radius: 8px;
-        padding: 40px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        margin: 100px auto;
-        max-width: 500px;
-    }
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 100px auto;
+    max-width: 500px;
+}
 
 .login-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
+    text-align: center;
+    margin-bottom: 30px;
+}
 
 .login-header h1 {
-        font-family: 'Montserrat', sans-serif;
-        color: #087990;
-        font-size: 2.5rem;
-    }
+    font-family: 'Montserrat', sans-serif;
+    color: #087990;
+    font-size: 2.5rem;
+}
 
 /* Адаптивный стиль для мобильных устройств */
 @media (max-width: 768px) {
-nav {
-    width: 100%;
-    height: auto;
-    border-left: none;
-    position: static;
-    padding: 15px 0;
-    border-bottom: 1px solid #e0e0e0;
+    nav {
+        width: 100%;
+        height: auto;
+        border-left: none;
+        position: static;
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
     }
 
-header, .diary-section, footer {
-    margin-left: 0;
-    margin-right: 0;
+    header, .diary-section, footer {
+        margin-left: 0;
+        margin-right: 0;
     }
 }
