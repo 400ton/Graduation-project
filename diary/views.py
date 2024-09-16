@@ -57,10 +57,18 @@ class DiaryDetailView(LoginRequiredMixin, DetailView):
     model = Diary
     template_name = 'diary/diary_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'О заметке'
-        return context
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        Diary.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+        self.object.refresh_from_db()
+        if self.object.views >= 100:
+            send_mail(
+                subject='Уведомление',
+                message='Ваша запись достигла 100 просмотров!',
+                from_email=EMAIL_HOST_USER,
+                recipient_list=[self.object.owner.email,]
+            )
+        return self.object
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -69,22 +77,10 @@ class DiaryDetailView(LoginRequiredMixin, DetailView):
             self.object.save()
         return redirect('diary:detail', slug=self.object.slug)
 
-    @staticmethod
-    def send_notification():
-        send_mail(
-            subject='Уведомление',
-            message='Ваша запись достигла 100 просмотров!',
-            from_email=EMAIL_HOST_USER,
-            recipient_list=[User.email, ]
-        )
-
-    def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        Diary.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
-        self.object.refresh_from_db()
-        if self.object.views >= 100:
-            self.send_notification()
-        return self.object
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'О заметке'
+        return context
 
 
 class DiaryCreateView(LoginRequiredMixin, CreateView):
