@@ -64,7 +64,7 @@ class DiaryDetailView(LoginRequiredMixin, DetailView):
         Diary.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
         self.object.refresh_from_db()
 
-        if self.object.views >= 10:
+        if self.object.views >= 100:
             html_message = render_to_string('diary/emails/email_notification.html', {'title': self.object.title})
             plain_message = strip_tags(
                 html_message)
