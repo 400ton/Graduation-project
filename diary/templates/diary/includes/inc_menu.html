@@ -4,10 +4,15 @@
     <a href="{% url 'diary:list' %}">Мой дневник</a>
     <a href="{% url 'users:profile' %}">Профиль</a>
     <a href="{% url 'diary:create' %}">Создать запись</a>
-    <a href="#">Сообщения</a>
+    <!-- a href="#">Сообщения</a -->
 
     {% if perms.diary.can_moderate %}
-    <a href="{% url 'diary:moderation_list' %}">Модерация</a>
+    <a href="{% url 'diary:moderation_list' %}">
+        Модерация
+        {% if moderation_count > 0 %}
+        <span class="badge">{{ moderation_count }}</span>
+        {% endif %}
+    </a>
     {% endif %}
 
     <a href="{% url 'users:logout' %}">Выйти</a>
@@ -17,3 +22,4 @@
     <a href="{% url 'users:register' %}">Регистрация</a>
     {% endif %}
 </nav>
+
