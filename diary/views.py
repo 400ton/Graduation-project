@@ -1,7 +1,9 @@
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy, reverse
+from django.utils.html import strip_tags
 from django.views import View
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView, DetailView
 from django.db.models import F
@@ -61,19 +63,26 @@ class DiaryDetailView(LoginRequiredMixin, DetailView):
         self.object = super().get_object(queryset)
         Diary.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
         self.object.refresh_from_db()
-        if self.object.views >= 100:
+
+        if self.object.views >= 10:
+            html_message = render_to_string('diary/emails/email_notification.html', {'title': self.object.title})
+            plain_message = strip_tags(
+                html_message)
+
             send_mail(
                 subject='Уведомление',
-                message='Ваша запись достигла 100 просмотров!',
+                message=plain_message,
                 from_email=EMAIL_HOST_USER,
-                recipient_list=[self.object.owner.email,]
+                recipient_list=[self.object.owner.email],
+                html_message=html_message
             )
+
         return self.object
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if 'publish' in request.POST:
-            self.object.status = 'moderation'  # Изменение статуса на "На модерации"
+            self.object.status = 'moderation'
             self.object.save()
         return redirect('diary:detail', slug=self.object.slug)
 
