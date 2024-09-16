@@ -45,7 +45,7 @@
 </style>
 
 <div class="diary-update-container">
-    <h1 class="diary-update-title">Создать заметку</h1>
+    <h1 class="diary-update-title">{{ title_h1 }}</h1>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

@@ -130,6 +130,7 @@ class DiaryCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Новая заметка'
+        context['title_h1'] = 'Создать заметку'
         return context
 
 
@@ -150,6 +151,7 @@ class DiaryUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Обновить заметку'
+        context['title_h1'] = 'Редактировать заметку'
         return context
 
 
