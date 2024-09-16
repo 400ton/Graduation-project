@@ -65,7 +65,6 @@
 
 <div class="container">
     <div class="diary-section row">
-        <h1 class="text-center">Список записей</h1>
         {% for diary in object_list %}
         <div class="diary-entry col-md-4 mb-4">
             <h2>{{ diary.title|truncatewords:5 }}</h2>
@@ -99,6 +98,27 @@
             </div>
         </div>
         {% endfor %}
+        <div class="diary-entry">
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Первая </a>
+                <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                <a href="?page={{ paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+    </div>
     </div>
 </div>
 

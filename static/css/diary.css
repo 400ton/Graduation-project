@@ -47,6 +47,16 @@ nav a:hover {
     color: #087990;
 }
 
+.badge {
+    background-color: #ff6f61;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    vertical-align: top;
+    margin-left: 10px;
+}
+
 /* Заголовок */
 header {
     background-color: #ffffff;

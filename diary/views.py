@@ -182,7 +182,7 @@ class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
     model = Diary
     template_name = 'diary/moderation_list.html'
     permission_required = 'diary.can_moderate'
-    paginate_by = 10
+    paginate_by = 6
 
     def get_queryset(self):
         return Diary.objects.filter(status='moderation')
