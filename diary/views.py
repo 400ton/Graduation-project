@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
@@ -12,7 +13,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from config.settings import EMAIL_HOST_USER
 from diary.forms import DiaryForm, DiaryUpdateForm
 from diary.models import Diary
-from users.models import User
 
 
 class HomeListView(ListView):
@@ -22,8 +22,10 @@ class HomeListView(ListView):
     """
     model = Diary
     template_name = "diary/home.html"
-    queryset = Diary.objects.filter(is_published=True)  # выбираем только опубликованные записи
-    paginate_by = 5  # опционально: добавляет пагинацию, например, по 6 записей на страницу
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Diary.objects.filter(is_published=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,51 +42,69 @@ class DiaryListView(LoginRequiredMixin, ListView):
     template_name = 'diary/diary_list.html'
     paginate_by = 10
 
+    def get_queryset(self):
+        return Diary.objects.filter(owner=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Список заметок'
         return context
 
-    def get_queryset(self):
-        return Diary.objects.filter(owner=self.request.user)
 
-
-class DiaryDetailView(LoginRequiredMixin, DetailView):
+class DiaryDetailView(DetailView):
     """
     Представление для отображения деталей записи.
     - При каждом просмотре запись увеличивает счетчик просмотров.
     - Если просмотров более 100, отправляется уведомление.
     - При POST запросе запись может быть отправлена на модерацию.
+    - Опубликованная запись доступна всем пользователям (включая неавторизованных).
+    - Неопубликованная запись доступна только владельцу.
     """
     model = Diary
     template_name = 'diary/diary_detail.html'
 
     def get_object(self, queryset=None):
-        self.object = super().get_object(queryset)
-        Diary.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
-        self.object.refresh_from_db()
+        """
+        Получает объект записи, увеличивает счетчик просмотров,
+        если запись опубликована. Если количество просмотров >= 100,
+        отправляется уведомление владельцу записи.
+        """
+        diary = super().get_object(queryset)
 
-        if self.object.views >= 100:
-            html_message = render_to_string('diary/emails/email_notification.html', {'title': self.object.title})
-            plain_message = strip_tags(
-                html_message)
+        # Проверка доступа
+        if not diary.is_published and (self.request.user != diary.owner):
+            raise PermissionDenied("У вас нет доступа к этой записи.")
+
+        # Счетчик просмотров только для опубликованных записей
+        if diary.is_published:
+            Diary.objects.filter(pk=diary.pk).update(views=F('views') + 1)
+            diary.refresh_from_db()
+
+        # Уведомление владельцу
+        if diary.views >= 100:
+            html_message = render_to_string('diary/emails/email_notification.html',
+                                            {'title': diary.title})
+            plain_message = strip_tags(html_message)
 
             send_mail(
                 subject='Уведомление',
                 message=plain_message,
                 from_email=EMAIL_HOST_USER,
-                recipient_list=[self.object.owner.email],
+                recipient_list=[diary.owner.email],
                 html_message=html_message
             )
-
-        return self.object
+        return diary
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        """
+        Обрабатывает POST запрос. Если пользователь отправляет запрос на публикацию записи,
+        статус записи изменяется на "moderation".
+        """
+        diary = self.get_object()
         if 'publish' in request.POST:
-            self.object.status = 'moderation'
-            self.object.save()
-        return redirect('diary:detail', slug=self.object.slug)
+            diary.status = 'moderation'
+            diary.save()
+        return redirect('diary:detail', slug=diary.slug)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -109,7 +129,7 @@ class DiaryCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Новая запись'
+        context['title'] = 'Новая заметка'
         return context
 
 
@@ -121,15 +141,15 @@ class DiaryUpdateView(LoginRequiredMixin, UpdateView):
     model = Diary
     form_class = DiaryUpdateForm
 
-    def form_valid(self, form):
-        return super().form_valid(form)
+    def get_queryset(self):
+        return Diary.objects.filter(owner=self.request.user)
 
     def get_success_url(self):
-        return reverse('diary:list')
+        return reverse('diary:detail', kwargs={'slug': self.object.slug})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Обновить запись'
+        context['title'] = 'Обновить заметку'
         return context
 
 
@@ -141,6 +161,9 @@ class DiaryDeleteView(LoginRequiredMixin, DeleteView):
     """
     model = Diary
     success_url = reverse_lazy('diary:list')
+
+    def get_queryset(self):
+        return Diary.objects.filter(owner=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -157,6 +180,7 @@ class DiaryModerationListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
     model = Diary
     template_name = 'diary/moderation_list.html'
     permission_required = 'diary.can_moderate'
+    paginate_by = 10
 
     def get_queryset(self):
         return Diary.objects.filter(status='moderation')
@@ -185,5 +209,4 @@ class DiaryModerationActionView(LoginRequiredMixin, PermissionRequiredMixin, Vie
         elif 'reject' in request.POST:
             diary.status = 'rejected'
             diary.save()
-
         return HttpResponseRedirect(reverse('diary:moderation_list'))
