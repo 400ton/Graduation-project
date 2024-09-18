@@ -7,7 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.utils.html import strip_tags
 from django.views import View
 from django.views.generic import CreateView, DeleteView, UpdateView, ListView, DetailView
-from django.db.models import F
+from django.db.models import F, Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from config.settings import EMAIL_HOST_USER
@@ -43,7 +43,13 @@ class DiaryListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Diary.objects.filter(owner=self.request.user)
+        queryset = Diary.objects.filter(owner=self.request.user)
+        query = self.request.GET.get('q')
+
+        if query:
+            queryset = queryset.filter(Q(title__icontains=query))
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

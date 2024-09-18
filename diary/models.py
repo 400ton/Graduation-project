@@ -13,7 +13,7 @@ class Diary(models.Model):
     )
     title = models.CharField(max_length=100, verbose_name="Заголовок")
     content = models.TextField(verbose_name='Описание')
-    slug = models.SlugField(unique=True, **NULLABLE)
+    slug = models.SlugField(**NULLABLE)
     preview = models.ImageField(upload_to='media/diary/images', verbose_name='Изображение', **NULLABLE)
     created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     views = models.IntegerField(default=0, verbose_name='Просмотры')
@@ -28,14 +28,13 @@ class Diary(models.Model):
         slug = slugify(self.title)
         unique_slug = slug
         num = 1
-        while Diary.objects.filter(slug=unique_slug).exists():
+        if not self.slug or Diary.objects.filter(slug=unique_slug).exists():
             unique_slug = f"{slug}-{num}"
             num += 1
         return unique_slug
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = self.get_unique_slug()
+        self.slug = self.get_unique_slug()
         super().save(*args, **kwargs)
 
     class Meta:
